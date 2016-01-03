@@ -9,10 +9,10 @@
  */
 struct ProcMesh
 {
-  struct tv_Mesh mesh;
+  struct Mesh mesh;
   int lod;
   void (*rebuild)(struct ProcMesh*, int);
-}
+};
 
 struct ProcMesh * NewProcMesh(int, int, void (*rebuild)(struct ProcMesh*, int));
 
