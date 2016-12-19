@@ -4,6 +4,6 @@
 #include "entity.h"
 
 void InitFpsControllerSystem();
-void FpsControllerPossess(struct tv_Entity*);
+void FpsControllerPossess(struct tv_Entity *);
 
 #endif

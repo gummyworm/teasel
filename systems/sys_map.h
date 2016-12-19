@@ -4,6 +4,6 @@
 #include <stdint.h>
 
 void InitMapSystem();
-void MapSystemLoad(uint16_t*);
+void MapSystemLoad(uint16_t *);
 
 #endif
