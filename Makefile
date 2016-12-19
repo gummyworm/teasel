@@ -11,4 +11,4 @@ teasel: $(SRC) $(CSRC) $(SYSRC) $(SCSRC)
 	gcc -o $@ $^ $(CFLAGS) $(INCLUDES) $(LIBS)
 
 clean:
-	rm moor
+	rm teasel 
