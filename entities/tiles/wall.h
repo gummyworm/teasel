@@ -3,7 +3,6 @@
 
 #include "entity.h"
 
-struct tv_Entity * Wall();
+struct tv_Entity *Wall();
 
 #endif
-

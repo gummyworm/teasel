@@ -1,10 +1,10 @@
-#include <stdbool.h>
-#include <stdint.h>
-#include <string.h>
 #include "draw.h"
 #include "entity.h"
 #include "sys_config.h"
 #include "system.h"
+#include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
 
 #include "components/cam.h"
 #include "components/enum.h"
@@ -32,14 +32,15 @@ static void drawTile(struct MapTile *t) {
 		struct Mesh *mesh;
 
 		e = t->contents[i];
-		if (e == NULL) break;
+		if (e == NULL)
+			break;
 
 		mesh = (struct Mesh *)tv_EntityGetComponent(e, COMPONENT_MESH);
 		if (mesh != NULL) {
 			struct Material *mat;
 			mat = (struct Material *)tv_EntityGetComponent(
 			    e, COMPONENT_MATERIAL);
-			tv_Draw(mesh, mat);
+			tv_Draw(NULL, mesh, mat);
 		}
 	}
 }
@@ -81,7 +82,7 @@ void MapSystemRemove(unsigned x, unsigned y, struct tv_Entity *e) {
 		}
 	}
 	memmove(worldMap[y][x].contents + i, worldMap[y][x].contents + i + 1,
-		(TILE_CAPACITY - i));
+	        (TILE_CAPACITY - i));
 }
 
 /* InitMapSystem initializes the system used to manage the world map. */

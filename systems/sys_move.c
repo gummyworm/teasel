@@ -13,27 +13,29 @@ struct tv_Entity *movers[MAX_MOVERS];
 
 /* update moves all detected in-motion entities. */
 void globalUpdate() {
-  unsigned i;
-  for (i = 0; i < MAX_MOVERS; ++i) {
-    struct Transform *t;
-    struct MotionStats *ms;
-    struct tv_Entity *e;
+	unsigned i;
+	for (i = 0; i < MAX_MOVERS; ++i) {
+		struct Transform *t;
+		struct MotionStats *ms;
+		struct tv_Entity *e;
 
-    e = movers[i];
-    t = (struct Transform *)tv_EntityGetComponent(e, COMPONENT_TRANSFORM);
-    ms = (struct MotionStats *)tv_EntityGetComponent(e, COMPONENT_MOTIONSTATS);
-    /* TODO: update transform according to ms->velX, etc. */
-  }
+		e = movers[i];
+		t = (struct Transform *)tv_EntityGetComponent(
+		    e, COMPONENT_TRANSFORM);
+		ms = (struct MotionStats *)tv_EntityGetComponent(
+		    e, COMPONENT_MOTIONSTATS);
+		/* TODO: update transform according to ms->velX, etc. */
+	}
 }
 
 /* InitMoveSystem intializes the system responsible for moving entities. */
 void InitMoveSystem() {
-  struct tv_System sys = {
-      .enabled = true,
-      .Start = NULL,
-      .Update = NULL,
-      .Implements = NULL,
-      .GlobalUpdate = globalUpdate,
-  };
-  tv_RegisterSystem(&sys);
+	struct tv_System sys = {
+	    .enabled = true,
+	    .Start = NULL,
+	    .Update = NULL,
+	    .Implements = NULL,
+	    .GlobalUpdate = globalUpdate,
+	};
+	tv_RegisterSystem(&sys);
 }

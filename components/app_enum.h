@@ -3,11 +3,12 @@
 
 #include <components/enum.h>
 
-enum {
-  COMPONENT_MAINGUI = COMPONENT_END,
-  COMPONENT_BATTLESTATS,
-  COMPONENT_MOTIONSTATS,
-  COMPONENT_APP_END /* end of user-defined component enumeration */
+enum { COMPONENT_MAINGUI = COMPONENT_END,
+       COMPONENT_AI,
+       COMPONENT_CONSOLE,
+       COMPONENT_BATTLESTATS,
+       COMPONENT_MOTIONSTATS,
+       COMPONENT_APP_END /* end of user-defined component enumeration */
 };
 
 #endif

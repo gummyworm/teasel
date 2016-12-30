@@ -1,6 +1,6 @@
 #include "sys_maingui.h"
-#include <draw.h>
 #include "system.h"
+#include <draw.h>
 
 /* gui is a struct that contains the data used to render the main GUI. */
 static struct gui {};
