@@ -1,4 +1,4 @@
-LIBS  = -L. -levo2
+LIBS  = -L. -levo2 -lSDL2
 INCLUDES = -I../evo2 -I.
 CFLAGS = -Wall
 

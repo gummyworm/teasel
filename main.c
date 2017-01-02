@@ -1,6 +1,8 @@
 #include "debug.h"
+#include "systems/sys_console.h"
 #include "systems/sys_fps_controller.h"
 #include "systems/sys_gui.h"
+#include "systems/sys_inventory.h"
 #include "systems/sys_render.h"
 #include <engine.h>
 
@@ -11,6 +13,8 @@ static void initSys() {
 	InitRenderSystem();
 	InitGUISystem();
 	InitFpsControllerSystem();
+	InitConsoleSystem();
+	InitInventorySystem();
 }
 
 int main() {

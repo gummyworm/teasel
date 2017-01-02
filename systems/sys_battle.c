@@ -60,7 +60,8 @@ static void BattleDamage(struct tv_Entity *target, unsigned damage) {
 static void BattleAttack(struct tv_Entity *target, struct BattleAttack *atk) {
 	struct BattleStats *stats;
 
-	stats = tv_EntityGetComponent(target, COMPONENT_BATTLESTATS);
+	stats = (struct BattleStats *)tv_EntityGetComponent(
+	    target, COMPONENT_BATTLESTATS);
 	switch (atk->effect) {
 	case MOVE_DMGATTR:
 		break;

@@ -1,7 +1,10 @@
 #include "components/app_enum.h"
 #include "components/cam.h"
+#include "components/console.h"
+#include "components/description.h"
 #include "components/enum.h"
 #include "components/gui.h"
+#include "components/inventory.h"
 #include "components/material.h"
 #include "components/mesh.h"
 #include "components/motionstats.h"
@@ -35,7 +38,7 @@ static struct tv_Entity *player() {
 	                    &cam, COMPONENT_MOTIONSTATS, &mstats);
 }
 
-/* textTest spawns the test test entity. */
+/* textTest spawns the text test entity. */
 static struct tv_Entity *textTest() {
 	struct Transform transform;
 	struct GUIText guiText;
@@ -44,6 +47,30 @@ static struct tv_Entity *textTest() {
 	guiText = NewGUIText("hello world");
 	return tv_EntityNew(2, COMPONENT_TRANSFORM, &transform,
 	                    COMPONENT_GUITEXT, &guiText);
+}
+
+/* console spawns the console test entity. */
+static struct tv_Entity *console() {
+	struct Transform transform;
+	struct Console console;
+	struct Inventory inventory;
+	struct tv_Entity *item;
+	struct Description desc;
+
+	desc = NewDescription(NULL, "a short, pointy blade");
+	item = tv_EntityNew(1, COMPONENT_DESCRIPTION, &desc);
+
+	transform = NewTransform(tv_Vector3Zero, tv_Vector4Zero, tv_Vector3One);
+	console = NewConsole();
+	inventory = NewInventory();
+
+	tv_EntityRename(item, "SWORD");
+	InventoryAddItem(&inventory, item);
+	ConsoleAddLine(&console, "test");
+	debug_puts("spawning console");
+	return tv_EntityNew(3, COMPONENT_TRANSFORM, &transform,
+	                    COMPONENT_CONSOLE, &console, COMPONENT_INVENTORY,
+	                    &inventory);
 }
 
 /* tiles spawns the tile entities for the scene. */
@@ -73,11 +100,12 @@ static struct tv_Entity *tiles() {
 
 /* demo0 creates the demo0 scene. */
 void demo0() {
-	static struct tv_Entity *p, *t, *txt;
+	static struct tv_Entity *p, *t, *txt, *con;
 
 	p = player();
 	t = tiles();
 	txt = textTest();
+	con = console();
 
 	FpsControllerPossess(p);
 }

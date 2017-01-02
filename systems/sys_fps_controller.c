@@ -4,7 +4,6 @@
 #include "components/motionstats.h"
 #include "components/transform.h"
 #include "debug.h"
-#include "gui.h"
 #include "input.h"
 #include "matrix.h"
 #include "sigslot.h"
@@ -62,8 +61,6 @@ static void move(int axis, int amt) {
 		// moveY(amt);
 		break;
 	}
-	tv_GuiRect(0, 0, 30, 40, 0x1f08ffff);
-	tv_GuiText(30, 0, "HELLO WORLD!");
 }
 
 /* button is called when a button is pressed. */
