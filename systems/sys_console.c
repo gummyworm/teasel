@@ -1,4 +1,5 @@
 #include "sys_console.h"
+#include "app_signals.h"
 #include "components/app_enum.h"
 #include "components/console.h"
 #include "components/description.h"
@@ -9,7 +10,6 @@
 #include <SDL2/SDL.h> //XXX
 #include <stdio.h>
 #include <time.h>
-#include <varargs.h>
 
 /* err prints the error msg to the console. */
 #define err(msg, ...)                                                          \
@@ -278,5 +278,5 @@ void InitConsoleSystem() {
 	    .GlobalUpdate = globalUpdate,
 	};
 	tv_RegisterSystem(&sys);
-	CONNECT(ButtonDown, button);
+	GCONNECT(SIGGROUP_CONSOLE, ButtonDown, button);
 }

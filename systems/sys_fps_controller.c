@@ -1,4 +1,5 @@
 #include "sys_fps_controller.h"
+#include "app_signals.h"
 #include "components/app_enum.h"
 #include "components/enum.h"
 #include "components/motionstats.h"
@@ -113,9 +114,9 @@ void InitFpsControllerSystem() {
 	};
 	tv_RegisterSystem(&sys);
 
-	CONNECT(AxisMoved, move);
-	CONNECT(ButtonDown, button);
-	CONNECT(ButtonUp, buttonUp);
+	GCONNECT(SIGGROUP_FPS_CONTROLLER, AxisMoved, move);
+	GCONNECT(SIGGROUP_FPS_CONTROLLER, ButtonDown, button);
+	GCONNECT(SIGGROUP_FPS_CONTROLLER, ButtonUp, buttonUp);
 }
 
 /* FpsControllerPossess possesses e. */
