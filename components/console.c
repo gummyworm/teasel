@@ -13,7 +13,7 @@ struct Console NewConsole() {
 	return c;
 }
 
-/* ConsoleAddLine appends line to the console. */
+/* ConsoleAddLine appends text to the console. */
 void ConsoleAddLine(struct Console *console, const char *text) {
 	char *l;
 	int n;

@@ -54,23 +54,39 @@ static struct tv_Entity *console() {
 	struct Transform transform;
 	struct Console console;
 	struct Inventory inventory;
-	struct tv_Entity *item;
-	struct Description desc;
-
-	desc = NewDescription(NULL, "a short, pointy blade");
-	item = tv_EntityNew(1, COMPONENT_DESCRIPTION, &desc);
 
 	transform = NewTransform(tv_Vector3Zero, tv_Vector4Zero, tv_Vector3One);
 	console = NewConsole();
 	inventory = NewInventory();
 
-	tv_EntityRename(item, "SWORD");
-	InventoryAddItem(&inventory, item);
 	ConsoleAddLine(&console, "test");
 	debug_puts("spawning console");
 	return tv_EntityNew(3, COMPONENT_TRANSFORM, &transform,
 	                    COMPONENT_CONSOLE, &console, COMPONENT_INVENTORY,
 	                    &inventory);
+}
+
+/* sword spawns the sword entity */
+static struct tv_Entity *sword() {
+	struct Transform transform;
+	struct Mesh mesh;
+	struct Description desc;
+	struct tv_Entity *s;
+
+	struct Mesh *m;
+
+	transform = NewTransform((tv_Vector3){0.5f, 1.0f, 1.5f}, tv_Vector4Zero,
+	                         tv_Vector3One);
+	mesh = MeshNewQuad();
+	desc = NewDescription(NULL, "a sharp, pointed blade");
+	s = tv_EntityNew(3, COMPONENT_TRANSFORM, &transform, COMPONENT_MESH,
+	                 &mesh, COMPONENT_DESCRIPTION, &desc);
+	tv_EntityRename(s, "SWORD");
+
+	m = (struct Mesh *)tv_EntityGetComponent(s, COMPONENT_MESH);
+	MeshColor(m, 0x00, 0x20, 0xff, 0xff);
+
+	return s;
 }
 
 /* tiles spawns the tile entities for the scene. */
@@ -83,15 +99,23 @@ static struct tv_Entity *tiles() {
 	material = NewMaterial(0xffff, 0xffff, 0xffff, 0xffff);
 	for (y = 0; y < MAP_H; ++y) {
 		for (x = 0; x < MAP_W; ++x) {
+			struct tv_Entity *e;
+			struct Mesh *m;
+
 			if (tilemap[y * MAP_W + x] == 1) {
 				struct Transform transform;
 				transform = NewTransform(
 				    (tv_Vector3){x, 0.0f, y - 4},
 				    (tv_Quaternion){90.0f, 0, 0, 0},
 				    tv_Vector3One);
-				tv_EntityNew(3, COMPONENT_TRANSFORM, &transform,
-				             COMPONENT_MESH, &mesh,
-				             COMPONENT_MATERIAL, &material);
+				e = tv_EntityNew(3, COMPONENT_TRANSFORM,
+				                 &transform, COMPONENT_MESH,
+				                 &mesh, COMPONENT_MATERIAL,
+				                 &material);
+
+				m = (struct Mesh *)tv_EntityGetComponent(
+				    e, COMPONENT_MESH);
+				MeshColor(m, 100 + x * 8, y * 8, x * y, 0xff);
 			}
 		}
 	}
@@ -100,11 +124,12 @@ static struct tv_Entity *tiles() {
 
 /* demo0 creates the demo0 scene. */
 void demo0() {
-	static struct tv_Entity *p, *t, *txt, *con;
+	static struct tv_Entity *p, *t, *txt, *con, *sw;
 
 	p = player();
 	t = tiles();
 	txt = textTest();
+	sw = sword();
 	con = console();
 
 	FpsControllerPossess(p);

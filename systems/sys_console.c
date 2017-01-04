@@ -21,18 +21,30 @@
 		}                                                              \
 	}
 
+#define msg(msg, ...)                                                          \
+	{                                                                      \
+		char buff[128];                                                \
+		if (console != NULL) {                                         \
+			sprintf(buff, msg, __VA_ARGS__);                       \
+			ConsoleAddLine(console, buff);                         \
+		}                                                              \
+	}
+
 /* error messages */
 #define ERR_UNKNOWN_COMMAND "unknown command: %s"
 #define ERR_NUM_ARGS "expected %d argument(s); %d given"
 #define ERR_ITEM_NOT_FOUND "I don't have a %s"
+#define ERR_ITEM_NOT_VISIBLE "I don't see a %s"
 
 /* info messages */
 #define MSG_ITEM_DROPPED "Dropped %s"
+#define MSG_ITEM_TAKEN "The %s is in hand"
 
 /* command names */
 const char CMD_LS[] = "LS";
 const char CMD_DROP[] = "RM";
 const char CMD_LOOK[] = "LOOK";
+const char CMD_TAKE[] = "TAKE";
 
 static struct Console *console;
 static struct Inventory *inv;
@@ -80,6 +92,23 @@ static void look(char *name) {
 
 	if (d->detailed != NULL)
 		ConsoleAddLine(console, d->detailed);
+}
+
+/* take adds name to the inventory (if it exists can be added). */
+static void take(char *name) {
+	struct tv_Entity *e;
+
+	if (console == NULL || inv == NULL)
+		return;
+
+	e = tv_EntityGet(name);
+	if (e == NULL) {
+		err(ERR_ITEM_NOT_VISIBLE, name);
+		return;
+	}
+
+	InventoryAddItem(inv, e);
+	msg(MSG_ITEM_TAKEN, name);
 }
 
 /* listinv displays the contents of the inventory in console. */
@@ -134,6 +163,11 @@ static void exec(char *line) {
 			err_nargs(1, argc - 1);
 		else
 			look(argv[1]);
+	} else if (strncmp(argv[0], CMD_TAKE, sizeof(CMD_TAKE)) == 0) {
+		if (argc != 2)
+			err_nargs(1, argc - 1);
+		else
+			take(argv[1]);
 	} else {
 		if (argc > 0)
 			err_unknowncommand(argv[0]);
