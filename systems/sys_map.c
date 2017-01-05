@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "app_systems.h"
 #include "components/cam.h"
 #include "components/enum.h"
 #include "systems/sys_map.h"
@@ -94,7 +95,7 @@ void InitMapSystem() {
 	    .Implements = NULL,
 	    .GlobalUpdate = NULL,
 	};
-	tv_RegisterSystem(&sys);
+	tv_RegisterSystem(&sys, SYSTEM_MAP);
 }
 
 /* MapSystemLoad loads the given map data. */

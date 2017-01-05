@@ -2,6 +2,7 @@
 #include "debug.h"
 #include "input.h"
 #include "sigslot.h"
+#include "systems/app_systems.h"
 #include "systems/sys_console.h"
 #include "systems/sys_fps_controller.h"
 #include "systems/sys_gui.h"
@@ -17,6 +18,19 @@ static void button(int button) {
 	static uint32_t focused = SIGGROUP_FPS_CONTROLLER;
 
 	switch (button) {
+	case SDL_SCANCODE_F1:
+		if (tv_SystemEnabled(SYSTEM_CONSOLE)) {
+			tv_SystemDisable(SYSTEM_CONSOLE);
+			focused = SIGGROUP_FPS_CONTROLLER;
+			GDEACTIVATE(SIGGROUP_CONSOLE, ButtonDown);
+			GACTIVATE(SIGGROUP_FPS_CONTROLLER, ButtonDown);
+		} else {
+			tv_SystemEnable(SYSTEM_CONSOLE);
+			focused = SIGGROUP_CONSOLE;
+			GDEACTIVATE(SIGGROUP_FPS_CONTROLLER, ButtonDown);
+			GACTIVATE(SIGGROUP_CONSOLE, ButtonDown);
+		}
+		break;
 	case SDL_SCANCODE_TAB:
 		if (focused == SIGGROUP_FPS_CONTROLLER) {
 			focused = SIGGROUP_CONSOLE;

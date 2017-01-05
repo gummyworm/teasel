@@ -28,14 +28,20 @@ static struct tv_Entity *player() {
 	struct Cam cam;
 	struct Transform transform;
 	struct MotionStats mstats;
+	struct Console console;
+	struct Inventory inventory;
 
 	cam = NewCam();
 	transform = NewTransform(tv_Vector3Zero, tv_Vector4Zero, tv_Vector3One);
 	mstats = NewMotionStats(1, 1, 1, 1, 1);
+	console = NewConsole();
+	inventory = NewInventory();
 
 	debug_puts("spawning player");
-	return tv_EntityNew(3, COMPONENT_TRANSFORM, &transform, COMPONENT_CAM,
-	                    &cam, COMPONENT_MOTIONSTATS, &mstats);
+	return tv_EntityNew(5, COMPONENT_TRANSFORM, &transform, COMPONENT_CAM,
+	                    &cam, COMPONENT_MOTIONSTATS, &mstats,
+	                    COMPONENT_CONSOLE, &console, COMPONENT_INVENTORY,
+	                    &inventory);
 }
 
 /* textTest spawns the text test entity. */
@@ -47,23 +53,6 @@ static struct tv_Entity *textTest() {
 	guiText = NewGUIText("hello world");
 	return tv_EntityNew(2, COMPONENT_TRANSFORM, &transform,
 	                    COMPONENT_GUITEXT, &guiText);
-}
-
-/* console spawns the console test entity. */
-static struct tv_Entity *console() {
-	struct Transform transform;
-	struct Console console;
-	struct Inventory inventory;
-
-	transform = NewTransform(tv_Vector3Zero, tv_Vector4Zero, tv_Vector3One);
-	console = NewConsole();
-	inventory = NewInventory();
-
-	ConsoleAddLine(&console, "test");
-	debug_puts("spawning console");
-	return tv_EntityNew(3, COMPONENT_TRANSFORM, &transform,
-	                    COMPONENT_CONSOLE, &console, COMPONENT_INVENTORY,
-	                    &inventory);
 }
 
 /* sword spawns the sword entity */
@@ -124,13 +113,12 @@ static struct tv_Entity *tiles() {
 
 /* demo0 creates the demo0 scene. */
 void demo0() {
-	static struct tv_Entity *p, *t, *txt, *con, *sw;
+	static struct tv_Entity *p, *t, *txt, *sw;
 
 	p = player();
 	t = tiles();
 	txt = textTest();
 	sw = sword();
-	con = console();
 
 	FpsControllerPossess(p);
 }

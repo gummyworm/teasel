@@ -1,4 +1,5 @@
 #include "sys_maingui.h"
+#include "app_systems.h"
 #include "system.h"
 #include <draw.h>
 
@@ -17,5 +18,5 @@ void InitMainGUISystem() {
 	    .Implements = NULL,
 	    .GlobalUpdate = globalUpdate,
 	};
-	tv_RegisterSystem(&sys);
+	tv_RegisterSystem(&sys, SYSTEM_MAINGUI);
 }

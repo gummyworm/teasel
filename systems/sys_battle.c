@@ -5,6 +5,7 @@
 #include "components/battleattack.h"
 #include "components/battlestats.h"
 
+#include "app_systems.h"
 #include "sys_battle.h"
 #include "sys_config.h"
 
@@ -41,7 +42,7 @@ void InitBattleSystem() {
 	    .Implements = implements,
 	    .GlobalUpdate = NULL,
 	};
-	tv_RegisterSystem(&sys);
+	tv_RegisterSystem(&sys, SYSTEM_BATTLE);
 }
 
 /* BattleDamage inflicts damage on target. */

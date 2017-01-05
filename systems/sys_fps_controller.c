@@ -1,5 +1,6 @@
 #include "sys_fps_controller.h"
 #include "app_signals.h"
+#include "app_systems.h"
 #include "components/app_enum.h"
 #include "components/enum.h"
 #include "components/motionstats.h"
@@ -112,7 +113,7 @@ void InitFpsControllerSystem() {
 	    .Implements = NULL,
 	    .GlobalUpdate = globalUpdate,
 	};
-	tv_RegisterSystem(&sys);
+	tv_RegisterSystem(&sys, SYSTEM_FPS_CONTROLLER);
 
 	GCONNECT(SIGGROUP_FPS_CONTROLLER, AxisMoved, move);
 	GCONNECT(SIGGROUP_FPS_CONTROLLER, ButtonDown, button);

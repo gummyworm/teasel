@@ -1,4 +1,5 @@
 #include "sys_ai.h"
+#include "app_systems.h"
 #include "components/ai.h"
 #include "components/app_enum.h"
 #include "components/transform.h"
@@ -49,5 +50,5 @@ void InitAISystem() {
 	    .GlobalUpdate = NULL,
 	};
 
-	tv_RegisterSystem(&sys);
+	tv_RegisterSystem(&sys, SYSTEM_AI);
 }

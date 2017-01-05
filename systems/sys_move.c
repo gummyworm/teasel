@@ -4,6 +4,7 @@
 #include "sys_config.h"
 #include "sys_move.h"
 
+#include "app_systems.h"
 #include "components/app_enum.h"
 #include "components/enum.h"
 #include "components/motionstats.h"
@@ -37,5 +38,5 @@ void InitMoveSystem() {
 	    .Implements = NULL,
 	    .GlobalUpdate = globalUpdate,
 	};
-	tv_RegisterSystem(&sys);
+	tv_RegisterSystem(&sys, SYSTEM_MOVE);
 }

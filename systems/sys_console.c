@@ -1,9 +1,11 @@
 #include "sys_console.h"
 #include "app_signals.h"
+#include "app_systems.h"
 #include "components/app_enum.h"
 #include "components/console.h"
 #include "components/description.h"
 #include "components/inventory.h"
+#include "components/transform.h"
 #include "gui.h"
 #include "input.h"
 #include "system.h"
@@ -46,6 +48,7 @@ const char CMD_DROP[] = "RM";
 const char CMD_LOOK[] = "LOOK";
 const char CMD_TAKE[] = "TAKE";
 
+static struct Transform *transform;
 static struct Console *console;
 static struct Inventory *inv;
 static time_t tmrstart;
@@ -133,6 +136,15 @@ static void drop(char *item) {
 
 	for (i = 0; i < inv->numItems; ++i) {
 		if (strcmp(inv->items[i]->name, item) == 0) {
+			struct Transform *t;
+			t = (struct Transform *)tv_EntityGetComponent(
+			    inv->items[i], COMPONENT_TRANSFORM);
+			if (t != NULL) {
+				tv_Vector3Add(transform->pos,
+				              (tv_Vector3){0, 0, 1}, &t->pos);
+				printf("dropped @ (%f, %f, %f)\n", t->pos.x,
+				       t->pos.y, t->pos.z);
+			}
 			InventoryRemoveItem(inv, inv->items[i]);
 			itemdropped(item);
 			return;
@@ -252,6 +264,9 @@ static void start(struct tv_Entity *e) {
 	if ((c = tv_EntityGetComponent(e, COMPONENT_INVENTORY)) != NULL) {
 		inv = (struct Inventory *)c;
 	}
+	if ((c = tv_EntityGetComponent(e, COMPONENT_TRANSFORM)) != NULL) {
+		transform = (struct Transform *)c;
+	}
 }
 
 /* globalUpdate updates and draws the console window. */
@@ -311,6 +326,6 @@ void InitConsoleSystem() {
 	    .Implements = implements,
 	    .GlobalUpdate = globalUpdate,
 	};
-	tv_RegisterSystem(&sys);
+	tv_RegisterSystem(&sys, SYSTEM_CONSOLE);
 	GCONNECT(SIGGROUP_CONSOLE, ButtonDown, button);
 }

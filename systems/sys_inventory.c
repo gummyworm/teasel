@@ -1,4 +1,5 @@
 #include "sys_inventory.h"
+#include "app_systems.h"
 #include "components/app_enum.h"
 #include "system.h"
 
@@ -17,5 +18,5 @@ void InitInventorySystem() {
 	    .Implements = implements,
 	    .GlobalUpdate = NULL,
 	};
-	tv_RegisterSystem(&sys);
+	tv_RegisterSystem(&sys, SYSTEM_INVENTORY);
 }

@@ -1,4 +1,5 @@
 #include "sys_display.h"
+#include "app_systems.h"
 #include <stdbool.h>
 
 static void globalUpdate() {}
@@ -15,5 +16,5 @@ void InitDisplaySystem() {
 	    .Implements = NULL,
 	    .GlobalUpdate = globalUpdate,
 	};
-	tv_RegisterSystem(&sys);
+	tv_RegisterSystem(&sys, SYSTEM_DISPLAY);
 }
