@@ -5,6 +5,7 @@
 #include "components/console.h"
 #include "components/description.h"
 #include "components/inventory.h"
+#include "components/room.h"
 #include "components/transform.h"
 #include "gui.h"
 #include "input.h"
@@ -23,6 +24,7 @@
 		}                                                              \
 	}
 
+/* msg prints msg to the console. */
 #define msg(msg, ...)                                                          \
 	{                                                                      \
 		char buff[128];                                                \
@@ -37,19 +39,29 @@
 #define ERR_NUM_ARGS "expected %d argument(s); %d given"
 #define ERR_ITEM_NOT_FOUND "I don't have a %s"
 #define ERR_ITEM_NOT_VISIBLE "I don't see a %s"
+#define ERR_UNKNOWN_DIRECTION "You can't go %s"
+#define ERR_NO_EXIT "There is no exit %s"
+#define ERR_NO_TARGET "There is no target named %s"
 
 /* info messages */
 #define MSG_ITEM_DROPPED "Dropped %s"
 #define MSG_ITEM_TAKEN "The %s is in hand"
+#define MSG_ATTACK_TARGET "You attack %s"
 
 /* command names */
 const char CMD_LS[] = "LS";
 const char CMD_DROP[] = "RM";
 const char CMD_LOOK[] = "LOOK";
 const char CMD_TAKE[] = "TAKE";
+const char CMD_MOVE[] = "GO";
+const char CMD_KILL[] = "KILL";
+
+const char DIRECTION_NORTH[] = "NORTH";
+const char DIRECTION_SOUTH[] = "SOUTH";
 
 static struct Transform *transform;
 static struct Console *console;
+static struct Room *room;
 static struct Inventory *inv;
 static time_t tmrstart;
 
@@ -58,8 +70,10 @@ static void err_nargs(int expected, int actual) {
 	err(ERR_NUM_ARGS, expected, actual);
 }
 static void err_noitem(char *item) { err(ERR_ITEM_NOT_FOUND, item); }
+static void err_unknowntarget(char *target) { err(ERR_NO_TARGET, target); }
 
 void itemdropped(char *item) { err(MSG_ITEM_DROPPED, item); }
+void msg_attacktarget(char *target) { msg(MSG_ATTACK_TARGET, target); }
 
 /* getargs parses line, sets all the arguments found, and returns the number. */
 static int getargs(char *line, char **args) {
@@ -111,11 +125,12 @@ static void take(char *name) {
 	}
 
 	InventoryAddItem(inv, e);
+	e->enabled = false;
 	msg(MSG_ITEM_TAKEN, name);
 }
 
-/* listinv displays the contents of the inventory in console. */
-static void list() {
+/* inventory displays the contents of the inventory in console. */
+static void inventory() {
 	unsigned i;
 
 	if (console == NULL || inv == NULL)
@@ -127,31 +142,66 @@ static void list() {
 	}
 }
 
-/* drop removes item from the inventory. */
-static void drop(char *item) {
+/* move moves the player to the exit matching dir. */
+static void move(char *dir) {
+	if (strcmp(dir, DIRECTION_NORTH) == 0) {
+		if ((room != NULL) && (room->exits[ROOM_NORTH] != NULL)) {
+			room->exits[ROOM_NORTH]();
+		} else {
+			err(ERR_NO_EXIT, dir);
+		}
+	} else if ((strcmp(dir, DIRECTION_SOUTH) == 0)) {
+		if ((room != NULL) && (room->exits[ROOM_SOUTH] != NULL)) {
+			room->exits[ROOM_SOUTH]();
+		} else {
+			err(ERR_NO_EXIT, dir);
+		}
+	} else {
+		err(ERR_UNKNOWN_DIRECTION, dir);
+	}
+}
+
+/* drop removes the item name from the inventory. */
+static void drop(char *name) {
 	unsigned i;
 
 	if (console == NULL || inv == NULL)
 		return;
 
 	for (i = 0; i < inv->numItems; ++i) {
-		if (strcmp(inv->items[i]->name, item) == 0) {
+		if (strcmp(inv->items[i]->name, name) == 0) {
 			struct Transform *t;
+			struct tv_Entity *item;
+
+			item = inv->items[i];
 			t = (struct Transform *)tv_EntityGetComponent(
-			    inv->items[i], COMPONENT_TRANSFORM);
+			    item, COMPONENT_TRANSFORM);
 			if (t != NULL) {
 				tv_Vector3Add(transform->pos,
 				              (tv_Vector3){0, 0, 1}, &t->pos);
 				printf("dropped @ (%f, %f, %f)\n", t->pos.x,
 				       t->pos.y, t->pos.z);
 			}
-			InventoryRemoveItem(inv, inv->items[i]);
-			itemdropped(item);
+			InventoryRemoveItem(inv, item);
+			item->enabled = true;
+			itemdropped(name);
 			return;
 		}
 	}
 
-	err_noitem(item);
+	err_noitem(name);
+}
+
+/* kill engages target in combat and attempts to vanquish it. */
+static void kill(char *target) {
+	struct tv_Entity *e;
+	e = tv_EntityGet(target);
+
+	if (e == NULL) {
+		err_unknowntarget(target);
+		return;
+	}
+	msg_attacktarget(target);
 }
 
 /* exec executes line as a console command. */
@@ -164,7 +214,7 @@ static void exec(char *line) {
 	argc = getargs(l, argv);
 
 	if (strncmp(argv[0], CMD_LS, sizeof(CMD_LS)) == 0) {
-		list();
+		inventory();
 	} else if (strncmp(argv[0], CMD_DROP, sizeof(CMD_DROP)) == 0) {
 		if (argc != 2)
 			err_nargs(1, argc - 1);
@@ -180,9 +230,18 @@ static void exec(char *line) {
 			err_nargs(1, argc - 1);
 		else
 			take(argv[1]);
+	} else if (strncmp(argv[0], CMD_MOVE, sizeof(CMD_MOVE)) == 0) {
+		if (argc != 2)
+			err_nargs(1, argc - 1);
+		else
+			move(argv[1]);
+	} else if (strncmp(argv[0], CMD_KILL, sizeof(CMD_KILL)) == 0) {
+		if (argc != 2)
+			err_nargs(1, argc - 1);
+		else
+			kill(argv[1]);
 	} else {
-		if (argc > 0)
-			err_unknowncommand(argv[0]);
+		err_unknowncommand(argv[0]);
 	}
 }
 
@@ -247,7 +306,8 @@ static void button(int button) {
 	}
 }
 
-/* implements returns true if the given entity can be used as a console. */
+/* implements returns true if the given entity can be used as a console.
+ */
 static bool implements(struct tv_Entity *e) {
 	return tv_EntityGetComponent(e, COMPONENT_CONSOLE) != NULL;
 }

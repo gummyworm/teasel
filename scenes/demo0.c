@@ -12,6 +12,7 @@
 #include "debug.h"
 #include "entity.h"
 #include "systems/sys_fps_controller.h"
+#include "systems/sys_render.h"
 
 enum { MAP_W = 8,
        MAP_H = 8,
@@ -121,4 +122,6 @@ void demo0() {
 	sw = sword();
 
 	FpsControllerPossess(p);
+	RenderSetEye(
+	    (struct Transform *)tv_EntityGetComponent(p, COMPONENT_TRANSFORM));
 }

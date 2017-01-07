@@ -104,7 +104,7 @@ static void globalUpdate() {
 	}
 }
 
-/* InitFpsController initializes a first-person-? controller. */
+/* InitFpsController initializes the first-person controller system. */
 void InitFpsControllerSystem() {
 	struct tv_System sys = {
 	    .enabled = true,

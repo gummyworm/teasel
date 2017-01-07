@@ -10,6 +10,7 @@ enum { COMPONENT_MAINGUI = COMPONENT_END,
        COMPONENT_MOTIONSTATS,
        COMPONENT_INVENTORY,
        COMPONENT_DESCRIPTION,
+       COMPONENT_ROOM,
        COMPONENT_APP_END /* end of user-defined component enumeration */
 };
 
