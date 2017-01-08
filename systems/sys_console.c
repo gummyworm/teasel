@@ -47,6 +47,8 @@
 #define MSG_ITEM_DROPPED "Dropped %s"
 #define MSG_ITEM_TAKEN "The %s is in hand"
 #define MSG_ATTACK_TARGET "You attack %s"
+#define MSG_WIELD "You wield the %s"
+#define MSG_WEAR "You don the the %s"
 
 /* command names */
 const char CMD_LS[] = "LS";
@@ -55,6 +57,8 @@ const char CMD_LOOK[] = "LOOK";
 const char CMD_TAKE[] = "TAKE";
 const char CMD_MOVE[] = "GO";
 const char CMD_KILL[] = "KILL";
+const char CMD_WIELD[] = "WIELD";
+const char CMD_WEAR[] = "WEAR";
 
 const char DIRECTION_NORTH[] = "NORTH";
 const char DIRECTION_SOUTH[] = "SOUTH";
@@ -74,6 +78,8 @@ static void err_unknowntarget(char *target) { err(ERR_NO_TARGET, target); }
 
 void itemdropped(char *item) { err(MSG_ITEM_DROPPED, item); }
 void msg_attacktarget(char *target) { msg(MSG_ATTACK_TARGET, target); }
+void msg_wield(char *weapon) { msg(MSG_WIELD, weapon); }
+void msg_wear(char *item) { msg(MSG_WEAR, item); }
 
 /* getargs parses line, sets all the arguments found, and returns the number. */
 static int getargs(char *line, char **args) {
@@ -163,33 +169,29 @@ static void move(char *dir) {
 
 /* drop removes the item name from the inventory. */
 static void drop(char *name) {
-	unsigned i;
+	struct Transform *t;
+	struct tv_Entity *item;
 
 	if (console == NULL || inv == NULL)
 		return;
 
-	for (i = 0; i < inv->numItems; ++i) {
-		if (strcmp(inv->items[i]->name, name) == 0) {
-			struct Transform *t;
-			struct tv_Entity *item;
-
-			item = inv->items[i];
-			t = (struct Transform *)tv_EntityGetComponent(
-			    item, COMPONENT_TRANSFORM);
-			if (t != NULL) {
-				tv_Vector3Add(transform->pos,
-				              (tv_Vector3){0, 0, 1}, &t->pos);
-				printf("dropped @ (%f, %f, %f)\n", t->pos.x,
-				       t->pos.y, t->pos.z);
-			}
-			InventoryRemoveItem(inv, item);
-			item->enabled = true;
-			itemdropped(name);
-			return;
-		}
+	item = InventoryGetItem(inv, name);
+	if (item == NULL) {
+		err_noitem(name);
+		return;
 	}
 
-	err_noitem(name);
+	t = (struct Transform *)tv_EntityGetComponent(item,
+	                                              COMPONENT_TRANSFORM);
+	if (t != NULL) {
+		tv_Vector3Add(transform->pos, (tv_Vector3){0, 0, 1}, &t->pos);
+		printf("dropped @ (%f, %f, %f)\n", t->pos.x, t->pos.y,
+		       t->pos.z);
+	}
+
+	InventoryRemoveItem(inv, item);
+	item->enabled = true;
+	itemdropped(name);
 }
 
 /* kill engages target in combat and attempts to vanquish it. */
@@ -202,6 +204,36 @@ static void kill(char *target) {
 		return;
 	}
 	msg_attacktarget(target);
+}
+
+/* wield equips weapon. */
+static void wield(char *weapon) {
+	struct tv_Entity *item;
+	if (console == NULL || inv == NULL)
+		return;
+
+	item = InventoryGetItem(inv, weapon);
+	if (item == NULL) {
+		err_noitem(weapon);
+		return;
+	}
+
+	msg_wield(weapon);
+}
+
+/* wear puts on attire. */
+static void wear(char *attire) {
+	struct tv_Entity *item;
+	if (console == NULL || inv == NULL)
+		return;
+
+	item = InventoryGetItem(inv, attire);
+	if (item == NULL) {
+		err_noitem(attire);
+		return;
+	}
+
+	msg_wear(attire);
 }
 
 /* exec executes line as a console command. */
@@ -240,6 +272,16 @@ static void exec(char *line) {
 			err_nargs(1, argc - 1);
 		else
 			kill(argv[1]);
+	} else if (strncmp(argv[0], CMD_WIELD, sizeof(CMD_WIELD)) == 0) {
+		if (argc != 2)
+			err_nargs(1, argc - 1);
+		else
+			wield(argv[1]);
+	} else if (strncmp(argv[0], CMD_WEAR, sizeof(CMD_WEAR)) == 0) {
+		if (argc != 2)
+			err_nargs(1, argc - 1);
+		else
+			wear(argv[1]);
 	} else {
 		err_unknowncommand(argv[0]);
 	}

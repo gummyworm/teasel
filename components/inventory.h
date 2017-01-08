@@ -14,5 +14,6 @@ struct Inventory {
 struct Inventory NewInventory();
 void InventoryAddItem(struct Inventory *, struct tv_Entity *);
 bool InventoryRemoveItem(struct Inventory *, struct tv_Entity *);
+struct tv_Entity *InventoryGetItem(struct Inventory *, char *);
 
 #endif

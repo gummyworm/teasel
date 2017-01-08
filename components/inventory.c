@@ -1,4 +1,5 @@
 #include "inventory.h"
+#include "entity.h"
 #include <string.h>
 
 /* NewInventory creates a new inventory component and returns it. */
@@ -39,4 +40,15 @@ bool InventoryRemoveItem(struct Inventory *inv, struct tv_Entity *item) {
 	}
 
 	return found;
+}
+
+/* InventoryGetItem returns the item named name if it exists in inv. */
+struct tv_Entity *InventoryGetItem(struct Inventory *inv, char *name) {
+	unsigned i;
+	for (i = 0; i < inv->numItems; ++i) {
+		if (strcmp(inv->items[i]->name, name) == 0) {
+			return inv->items[i];
+		}
+	}
+	return NULL;
 }
