@@ -3,6 +3,4 @@
 
 #include "components/mesh.h"
 
-struct Mesh LoadPicAsMesh(const char *);
-
 #endif
