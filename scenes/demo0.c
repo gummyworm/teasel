@@ -79,6 +79,24 @@ static struct tv_Entity *sword() {
 	return s;
 }
 
+/* star spawns the star entity. */
+static struct tv_Entity *star() {
+	struct tv_Entity *e;
+	struct Transform transform;
+	struct Mesh mesh;
+	struct Material material;
+
+	debug_puts("spawning star");
+	transform = NewTransform(tv_Vector3One, tv_Vector4Zero, tv_Vector3One);
+	mesh = MeshNewObj("res/star.obj");
+	material = NewMaterial(0xffff, 0xffff, 0xffff, 0xffff);
+
+	e = tv_EntityNew(3, COMPONENT_TRANSFORM, transform, COMPONENT_MESH,
+	                 mesh, COMPONENT_MATERIAL, material);
+
+	return e;
+}
+
 /* tiles spawns the tile entities for the scene. */
 static struct tv_Entity *tiles() {
 	struct Material material;
@@ -114,12 +132,13 @@ static struct tv_Entity *tiles() {
 
 /* demo0 creates the demo0 scene. */
 void demo0() {
-	static struct tv_Entity *p, *t, *txt, *sw;
+	static struct tv_Entity *p, *t, *txt, *sw, *st;
 
 	p = player();
 	t = tiles();
 	txt = textTest();
 	sw = sword();
+	st = star();
 
 	FpsControllerPossess(p);
 	RenderSetEye(
